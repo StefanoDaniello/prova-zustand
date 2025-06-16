@@ -24,7 +24,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      {/* suppressHydrationWarning : esso serve ad eliminare 
+      il warnig di hydratation per next , che si verifica quando il contenuto 
+      lato server e divero da quallo lato client */}
       <body
+        suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
