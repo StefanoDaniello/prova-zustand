@@ -29,7 +29,7 @@ export default function RootLayout({
       lato server e divero da quallo lato client */}
       <body
         suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased `}
       >
         {children}
       </body>
