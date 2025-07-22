@@ -1,6 +1,5 @@
 "use client";
 
-import { log } from "console";
 import { useCounterStore } from "./store";
 import { useEffect } from "react";
 
@@ -9,9 +8,18 @@ const setCount = () => {
 };
 
 export default function Home() {
+  // Abbiamo due esempi
+  // 1.  viediamo che prendiamo state.count quindi count si reinderizzera ogni volta che count si modifica
+  // 2.  destrutturiamo e ci mettiamo in ascolto dello state quindi ogni volta che qualche stato cambia in nell file store count si reinderizza
+
+  // quindi bisogna essere precisi quando si prende uno stato per non causare il molteplice reinderizzamento dello stato o funzione che lo modifica
+
   const count = useCounterStore((state) => state.count);
+  // const { count } = useCounterStore((state) => state);
+
   const increment = useCounterStore((state) => state.increase);
-  const increaseAsync = useCounterStore((state) => state.increaseAsync);
+  const incrementAsync = useCounterStore((state) => state.incrementAsync);
+  const decrementAsync = useCounterStore((state) => state.decrementAsync);
   const decrement = useCounterStore((state) => state.decrease);
 
   useEffect(() => {
@@ -28,8 +36,19 @@ export default function Home() {
         >
           +
         </button>
-        <button onClick={increaseAsync}>IncreseAsync</button>
+        <button
+          onClick={incrementAsync}
+          className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
+        >
+          incrementAsync
+        </button>
         <div>{count}</div>
+        <button
+          onClick={decrementAsync}
+          className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
+        >
+          decrementAsync
+        </button>
         <button
           onClick={decrement}
           className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
