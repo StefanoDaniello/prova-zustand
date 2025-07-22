@@ -13,6 +13,8 @@ import {
   Globe,
   Home,
   Rocket,
+  BowArrow,
+  Sword,
 } from "lucide-react";
 
 // Array base di icone
@@ -29,6 +31,8 @@ const baseIcons: IconItem[] = [
   { id: 10, name: "globe", icon: Globe, flipped: false },
   { id: 11, name: "home", icon: Home, flipped: false },
   { id: 12, name: "rocket", icon: Rocket, flipped: false },
+  { id: 13, name: "bow-arrow", icon: BowArrow, flipped: false },
+  { id: 14, name: "sword", icon: Sword, flipped: false },
 ];
 
 type IconItem = {

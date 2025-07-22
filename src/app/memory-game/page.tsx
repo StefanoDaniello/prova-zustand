@@ -55,10 +55,10 @@ function Card({
         }`}
       >
         {/* Lato front */}
-        <div className="absolute w-full h-full bg-[url('/card-bg.jpg')] bg-cover bg-center bg-no-repeat rounded-lg backface-hidden"></div>
+        <div className="absolute w-full h-full bg-[url('/card-bg.jpg')] bg-cover bg-center bg-no-repeat rounded-lg backface-hidden border border-white"></div>
 
         {/* Lato back */}
-        <div className="absolute w-full h-full bg-[url('/card-front.jpg')] bg-cover bg-center bg-no-repeat rounded-lg backface-hidden rotate-y-180 flex items-center justify-center text-white shadow-lg border border-white rounded-lg">
+        <div className="absolute w-full h-full bg-[url('/card-front.jpg')] bg-cover bg-center bg-no-repeat rounded-lg backface-hidden rotate-y-180 flex items-center justify-center text-white shadow-lg border border-white">
           <IconComponent className="w-20 h-20" />
         </div>
       </div>
