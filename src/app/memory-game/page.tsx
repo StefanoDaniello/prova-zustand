@@ -47,7 +47,7 @@ function Card({
   return (
     <div
       onClick={() => flipCard(id)}
-      className="relative w-[150px] h-[200px] perspective cursor-pointer"
+      className="relative w-[150px] h-[200px] perspective cursor-pointer "
     >
       <div
         className={`relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group ${
@@ -55,11 +55,11 @@ function Card({
         }`}
       >
         {/* Lato front */}
-        <div className="absolute w-full h-full bg-[url('/card-bg.png')] bg-contain bg-center bg-no-repeat rounded-lg backface-hidden"></div>
+        <div className="absolute w-full h-full bg-[url('/card-bg.jpg')] bg-cover bg-center bg-no-repeat rounded-lg backface-hidden"></div>
 
         {/* Lato back */}
-        <div className="absolute w-full h-full bg-white rounded-lg backface-hidden rotate-y-180 flex items-center justify-center text-gray-700 shadow-lg text-3xl">
-          <IconComponent />
+        <div className="absolute w-full h-full bg-[url('/card-front.jpg')] bg-cover bg-center bg-no-repeat rounded-lg backface-hidden rotate-y-180 flex items-center justify-center text-white shadow-lg border border-white rounded-lg">
+          <IconComponent className="w-20 h-20" />
         </div>
       </div>
     </div>
