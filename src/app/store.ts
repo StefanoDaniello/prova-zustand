@@ -1,3 +1,5 @@
+// Lo store in zustand e dove andiamo a memorizzare lo stato e qualsiasi funzione che aggiorna quello stato
+
 import { create } from "zustand";
 
 type CounterStore = {
