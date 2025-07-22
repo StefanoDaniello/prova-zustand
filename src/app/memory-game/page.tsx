@@ -1,5 +1,67 @@
 "use client";
 
-export default function memoryGame() {
-  <div>hello</div>;
+import { useEffect, ElementType } from "react";
+
+import { useMemoryGameStore } from "../zustand-state/memory-game-store";
+
+export default function MemoryGame() {
+  const shuffledIcons = useMemoryGameStore((state) => state.shuffledIcons);
+  const setShuffledIcons = useMemoryGameStore(
+    (state) => state.setShuffledIcons
+  );
+
+  useEffect(() => {
+    if (shuffledIcons.length === 0) {
+      setShuffledIcons();
+    }
+  }, [shuffledIcons, setShuffledIcons]);
+
+  return (
+    <div className="flex justify-center items-center h-screen">
+      <div className="grid grid-cols-4 gap-4">
+        {shuffledIcons.map((icon) => (
+          <Card
+            key={icon.id}
+            id={icon.id}
+            icon={icon.icon}
+            flipped={icon.flipped}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Card({
+  id,
+  icon,
+  flipped,
+}: {
+  id: number;
+  icon: ElementType;
+  flipped: boolean;
+}) {
+  const flipCard = useMemoryGameStore((state) => state.flipCard);
+  const IconComponent = icon;
+
+  return (
+    <div
+      onClick={() => flipCard(id)}
+      className="relative w-[150px] h-[200px] perspective cursor-pointer"
+    >
+      <div
+        className={`relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group ${
+          flipped ? "rotate-y-180" : ""
+        }`}
+      >
+        {/* Lato front */}
+        <div className="absolute w-full h-full bg-[url('/card-bg.png')] bg-contain bg-center bg-no-repeat rounded-lg backface-hidden"></div>
+
+        {/* Lato back */}
+        <div className="absolute w-full h-full bg-white rounded-lg backface-hidden rotate-y-180 flex items-center justify-center text-gray-700 shadow-lg text-3xl">
+          <IconComponent />
+        </div>
+      </div>
+    </div>
+  );
 }
