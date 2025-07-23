@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { ReactNode, ElementType } from "react";
+import { ReactNode, ElementType, JSX } from "react";
 import {
   Heart,
   Star,
@@ -15,9 +15,24 @@ import {
   Rocket,
   BowArrow,
   Sword,
+  Flame,
+  Ghost,
+  Gift,
+  Hand,
+  Headphones,
+  Key,
+  Leaf,
+  Lock,
+  Magnet,
+  Map,
+  Palette,
+  Paperclip,
+  Shield,
+  ShoppingCart,
+  ThumbsUp,
+  Watch,
 } from "lucide-react";
 
-// Array base di icone
 const baseIcons: IconItem[] = [
   { id: 1, name: "heart", icon: Heart, flipped: false, matched: false },
   { id: 2, name: "star", icon: Star, flipped: false, matched: false },
@@ -33,6 +48,40 @@ const baseIcons: IconItem[] = [
   { id: 12, name: "rocket", icon: Rocket, flipped: false, matched: false },
   { id: 13, name: "bow-arrow", icon: BowArrow, flipped: false, matched: false },
   { id: 14, name: "sword", icon: Sword, flipped: false, matched: false },
+  { id: 15, name: "flame", icon: Flame, flipped: false, matched: false },
+  { id: 16, name: "ghost", icon: Ghost, flipped: false, matched: false },
+  { id: 17, name: "gift", icon: Gift, flipped: false, matched: false },
+  { id: 18, name: "hand", icon: Hand, flipped: false, matched: false },
+  {
+    id: 19,
+    name: "headphones",
+    icon: Headphones,
+    flipped: false,
+    matched: false,
+  },
+  { id: 20, name: "key", icon: Key, flipped: false, matched: false },
+  { id: 21, name: "leaf", icon: Leaf, flipped: false, matched: false },
+  { id: 22, name: "lock", icon: Lock, flipped: false, matched: false },
+  { id: 23, name: "magnet", icon: Magnet, flipped: false, matched: false },
+  { id: 24, name: "map", icon: Map, flipped: false, matched: false },
+  { id: 25, name: "palette", icon: Palette, flipped: false, matched: false },
+  {
+    id: 26,
+    name: "paperclip",
+    icon: Paperclip,
+    flipped: false,
+    matched: false,
+  },
+  { id: 27, name: "shield", icon: Shield, flipped: false, matched: false },
+  {
+    id: 28,
+    name: "shopping-cart",
+    icon: ShoppingCart,
+    flipped: false,
+    matched: false,
+  },
+  { id: 29, name: "thumbs-up", icon: ThumbsUp, flipped: false, matched: false },
+  { id: 30, name: "watch", icon: Watch, flipped: false, matched: false },
 ];
 
 type IconItem = {
@@ -43,12 +92,15 @@ type IconItem = {
   matched: boolean;
 };
 
-const enum Modality {
-  easy = "easy",
-  medium = "medium",
-  hard = "hard",
-  impossible = "impossible",
-}
+type ModalityOption = {
+  name: "easy" | "medium" | "hard" | "impossible";
+  isActive: boolean;
+};
+
+type MatchStatusOption = {
+  name: "win" | "lose" | "progress";
+  isActive: boolean;
+};
 
 type MemoryGameStore = {
   shuffledIcons: IconItem[];
@@ -58,11 +110,15 @@ type MemoryGameStore = {
   checkMatchCard: () => void; // Controlla se le due carte girate corrispondono
   canFlip: boolean;
   reShuffleBoard: () => void;
+
   point: number;
   win: number;
   lose: number;
-  time: number;
-  modality: Modality;
+  time: string;
+  matchStatus: MatchStatusOption;
+  setMatchStatus: () => void;
+  modality: ModalityOption;
+  setModality: () => void;
 };
 
 // Funzione per mischiare un array
@@ -78,8 +134,12 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
   point: 0,
   win: 0,
   lose: 0,
-  time: 0,
-  modality: Modality.easy,
+  time: "3:20",
+  modality: { name: "easy", isActive: false },
+  matchStatus: { name: "progress", isActive: false },
+
+  setMatchStatus: () => {},
+  setModality: () => {},
 
   setShuffledIcons: () => {
     const selected = shuffle(baseIcons).slice(0, 6);
@@ -155,7 +215,7 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
   },
 
   checkMatchCard: () => {
-    const { flippedCardsInTurn, reShuffleBoard } = get();
+    const { flippedCardsInTurn, reShuffleBoard, shuffledIcons } = get();
 
     if (flippedCardsInTurn.length !== 2) {
       console.error(
@@ -190,9 +250,33 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
       }));
       console.log(`Nessuna corrispondenza: ${card1.name} vs ${card2.name}`);
     }
-    setTimeout(() => {
-      reShuffleBoard();
-    }, 500); // Ritardo di 0.5 secondo per l'effetto visivo
+
+    // Step 2: Ottieni lo stato aggiornato dopo il primo 'set'
+    // Questo è importante per avere la visione più recente delle carte abbinate
+    const currentShuffledIconsAfterFlip = get().shuffledIcons;
+    const unmatchedCards = currentShuffledIconsAfterFlip.filter(
+      (card) => !card.matched
+    );
+
+    // Step 3: Controlla se rimangono esattamente 2 carte non abbinate
+    if (unmatchedCards.length === 2) {
+      console.log(
+        "Rimanenti solo 2 carte non abbinate. Le abbino automaticamente."
+      );
+      // Forza l'abbinamento e la visualizzazione delle ultime due carte
+      set((state) => ({
+        shuffledIcons: state.shuffledIcons.map((card) =>
+          // Se la carta non è ancora abbinata, la flippa e la marca come abbinata
+          !card.matched ? { ...card, flipped: true, matched: true } : card
+        ),
+        // Non è necessario toccare flippedCardsInTurn o canFlip qui,
+        // sono già stati gestiti dal set precedente e il gioco è quasi finito.
+      }));
+    } else {
+      setTimeout(() => {
+        reShuffleBoard();
+      }, 500); // Ritardo di 0.5 secondo per l'effetto visivo
+    }
   },
 
   reShuffleBoard: () => {

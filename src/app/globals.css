@@ -14,16 +14,25 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #121924;
     --foreground: #ededed;
+    --card-dark-green: #002a0c; /* Verde scuro predominante */
+    --card-dark-green-light-fade: #006335; /* Verde più chiaro per la sfumatura */
+    --card-gold: #ffb300; /* Oro base */
+    --card-gold-light: #e0d080; /* Oro più chiaro per highlight */
+    --card-border-black: #0d0d0d; /* Nero quasi totale per il bordo */
+    --card-border-highlight: #d0d0d0; /* Grigio chiaro per il riflesso del bordo */
+    --card-inner-border-light: #e8e8e8; /* Bordo interno sottile */
   }
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Card (nessuna modifica qui, è già a posto) */
 .perspective {
   perspective: 1000px;
 }
@@ -38,4 +47,49 @@ body {
 
 .rotate-y-180 {
   transform: rotateY(180deg);
+}
+
+/* ------------------------------------- */
+/* Status Bar - Adattata ai colori della card */
+/* ------------------------------------- */
+
+.status-bar {
+  display: flex;
+  gap: 10px;
+  padding: 20px;
+  border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.status-indicator {
+  width: 65px;
+  height: 50px;
+  border-radius: 30px;
+  border: 4px solid var(--card-gold);
+  box-shadow: inset 0 0 0 2px var(--card-inner-border-light);
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+}
+
+.status-indicator.filled {
+  background: linear-gradient(
+    to bottom,
+    var(--card-dark-green-light-fade),
+    var(--card-dark-green)
+  );
+  border: 4px solid var(--card-gold);
+  /* Modifichiamo le ombre per replicare l'effetto 3D della card */
+  box-shadow: inset 0 0 0 2px var(--card-inner-border-light),
+    /* Bordo interno chiaro dalla card */ inset 0 4px 6px rgba(0, 0, 0, 0.4),
+    /* Ombra interna per profondità */ 0 2px 8px rgba(0, 0, 0, 0.5); /* Ombra esterna più pronunciata */
+}
+
+.timer {
+  filter: brightness(0) saturate(100%) invert(99%) sepia(0%) saturate(7500%)
+    hue-rotate(185deg) brightness(101%) contrast(104%);
+  width: 30px;
 }
