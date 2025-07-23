@@ -24,6 +24,7 @@ export default function MemoryGame() {
             key={icon.id}
             id={icon.id}
             icon={icon.icon}
+            matched={icon.matched}
             flipped={icon.flipped}
           />
         ))}
@@ -36,10 +37,12 @@ function Card({
   id,
   icon,
   flipped,
+  matched,
 }: {
   id: number;
   icon: ElementType;
   flipped: boolean;
+  matched: boolean;
 }) {
   const flipCard = useMemoryGameStore((state) => state.flipCard);
   const IconComponent = icon;
@@ -55,10 +58,18 @@ function Card({
         }`}
       >
         {/* Lato front */}
-        <div className="absolute w-full h-full bg-[url('/card-bg.jpg')] bg-cover bg-center bg-no-repeat rounded-lg backface-hidden border border-white"></div>
+        <div
+          className={`absolute w-full h-full bg-[url('/card-bg.jpg')] bg-cover bg-center bg-no-repeat rounded-lg backface-hidden border ${
+            matched ? "border-yellow-500" : "border-white"
+          }`}
+        ></div>
 
         {/* Lato back */}
-        <div className="absolute w-full h-full bg-[url('/card-front.jpg')] bg-cover bg-center bg-no-repeat rounded-lg backface-hidden rotate-y-180 flex items-center justify-center text-white shadow-lg border border-white">
+        <div
+          className={`absolute w-full h-full bg-[url('/card-front.jpg')] bg-cover bg-center bg-no-repeat rounded-lg backface-hidden rotate-y-180 flex items-center justify-center text-white shadow-lg border ${
+            matched ? "border-yellow-500" : "border-white"
+          }`}
+        >
           <IconComponent className="w-20 h-20" />
         </div>
       </div>
