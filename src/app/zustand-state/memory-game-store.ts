@@ -115,10 +115,14 @@ type MemoryGameStore = {
   point: number;
   win: number;
   lose: number;
+  time: string;
+  activeBalls: number;
+  setTime: (time: string) => void;
   matchStatus: MatchStatusOption;
   setMatchStatus: () => void;
   modality: ModalityOption;
   setModality: (name: string) => void;
+  countdownIntervalId: any;
 };
 
 export const Modalities: ModalityOption[] = [
@@ -138,6 +142,16 @@ function shuffle<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5);
 }
 
+// Funzione helper per formattare i secondi in "MM:SS"
+function formatTime(seconds: number) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  // Aggiungi uno zero iniziale se il numero è < 10
+  const formattedMinutes = String(minutes).padStart(2, "0");
+  const formattedSeconds = String(remainingSeconds).padStart(2, "0");
+  return `${formattedMinutes}:${formattedSeconds}`;
+}
+
 // Creazione dello store Zustand ,set setta lo stato , get  restituisce il valore
 export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
   shuffledIcons: [],
@@ -146,26 +160,97 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
   point: 0,
   win: 0,
   lose: 0,
+  activeBalls: 10,
+  time: "00:00",
   modality: Modalities[0],
   matchStatus: { name: "progress", isActive: false },
+  countdownIntervalId: null,
 
   setModality: (name) => {
-    const { setShuffledIcons } = get();
+    const { setShuffledIcons, setTime, modality, countdownIntervalId } = get();
     const selectModality = Modalities.find((modality) =>
       modality.name == name ? modality : null
     );
-
     set({
       modality: selectModality,
     });
-
     setShuffledIcons();
+    setTime(selectModality?.time ? selectModality?.time : modality.time);
+  },
+
+  setTime: (selectTime) => {
+    const { countdownIntervalId } = get();
+
+    // 1. Pulisci qualsiasi intervallo precedente per evitare più timer contemporanei
+    if (countdownIntervalId) {
+      clearInterval(countdownIntervalId);
+      set({ countdownIntervalId: null }); // Resetta l'ID nello stato
+    }
+    // 2. Converti la stringa "MM:SS" in secondi totali
+    const parts = selectTime.split(":");
+    let totalSeconds = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+
+    // ✅ Memorizza il tempo iniziale del countdown (per il calcolo dei pallini)
+    const initialCountdownSeconds = totalSeconds;
+    const numberOfBalls = 10; // Il numero totale di pallini
+
+    // ✅ Calcola ogni quanti secondi un pallino deve spegnersi
+    // Usiamo Math.max(1, ...) per evitare divisioni per zero o intervalli troppo piccoli
+    // se il tempo iniziale è molto breve. Ogni pallino non si spengera' piu' velocemente di 1 secondo.
+    const secondsPerBall =
+      initialCountdownSeconds > 0
+        ? Math.max(1, Math.ceil(initialCountdownSeconds / numberOfBalls))
+        : 0; // Se il tempo iniziale è 0, non ci sono secondi per pallino.
+
+    // Imposta immediatamente il tempo iniziale e tutti i pallini accesi
+    set({
+      time: formatTime(totalSeconds),
+      activeBalls: numberOfBalls, // Tutti i pallini accesi all'inizio
+    });
+
+    // 4. Avvia il countdown
+    const newIntervalId = setInterval(() => {
+      if (totalSeconds > 0) {
+        totalSeconds -= 1; // Decrementa di un secondo
+
+        // ✅ Nuova logica per aggiornare i pallini
+        let currentActiveBalls = numberOfBalls;
+
+        if (secondsPerBall > 0) {
+          // Calcola quanti blocchi di tempo sono trascorsi
+          const elapsedBlocks = Math.floor(
+            (initialCountdownSeconds - totalSeconds) / secondsPerBall
+          );
+          currentActiveBalls = Math.max(0, numberOfBalls - elapsedBlocks);
+        } else if (totalSeconds === 0) {
+          // Caso speciale per tempo iniziale 0
+          currentActiveBalls = 0;
+        }
+
+        set({
+          time: formatTime(totalSeconds),
+          activeBalls: currentActiveBalls, // Aggiorna il numero di pallini attivi
+        });
+      } else {
+        // 5. Tempo scaduto!
+        clearInterval(newIntervalId); // Ferma il timer
+        set({
+          countdownIntervalId: null, // Resetta l'ID del timer
+          time: "00:00", // Assicurati che il tempo finale sia 00:00
+          activeBalls: 0, // Tutti i pallini spenti
+        });
+      }
+    }, 1000); // Esegui ogni 1000 millisecondi (1 secondo)
+
+    set({ countdownIntervalId: newIntervalId });
   },
 
   setMatchStatus: () => {},
 
   setShuffledIcons: () => {
-    const { modality } = get();
+    const { modality, setTime } = get();
+    const modalityTime = modality.time;
+    setTime(modalityTime);
     const cardNumber = modality.cardNumber / 2;
     const selected = shuffle(baseIcons).slice(0, cardNumber);
     const duplicated = [...selected, ...selected].map((item, index) => ({
@@ -182,10 +267,8 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
     });
   },
 
-  // quando si trova una coppia di card con lo stesso nome si segna a true flipped
   flipCard: (id) => {
-    const { shuffledIcons, flippedCardsInTurn, canFlip, checkMatchCard } =
-      get();
+    const { shuffledIcons, canFlip, checkMatchCard } = get();
 
     // Impedisci di girare se non permesso (es. durante il ritardo del confronto)
     if (!canFlip) {
@@ -235,7 +318,7 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
       // Chiama checkForMatch dopo un breve ritardo per permettere all'utente di vedere la seconda carta
       setTimeout(() => {
         checkMatchCard();
-      }, 800); // Ritardo di 0.8 secondo per l'effetto visivo
+      }, 600); // Ritardo di 0.6 secondo per l'effetto visivo
     }
   },
 
@@ -261,6 +344,7 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
             : card
         ),
         flippedCardsInTurn: [], // Pulisce l'array temporaneo
+        canFlip: true,
       }));
       console.log(`Corrispondenza trovata: ${card1.name}`);
     } else {
@@ -272,6 +356,7 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
             : card
         ),
         flippedCardsInTurn: [], // Pulisce l'array temporaneo
+        canFlip: true,
       }));
       console.log(`Nessuna corrispondenza: ${card1.name} vs ${card2.name}`);
     }
@@ -298,9 +383,10 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
         // sono già stati gestiti dal set precedente e il gioco è quasi finito.
       }));
     } else {
-      setTimeout(() => {
-        reShuffleBoard();
-      }, 500); // Ritardo di 0.5 secondo per l'effetto visivo
+      // setTimeout(() => {
+      //   reShuffleBoard();
+      // }, 450);
+      // Ritardo di 0.5 secondo per l'effetto visivo
     }
   },
 

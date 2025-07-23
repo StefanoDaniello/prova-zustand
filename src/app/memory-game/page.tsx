@@ -14,8 +14,10 @@ export default function MemoryGame() {
   const point = useMemoryGameStore((state) => state.point);
   const win = useMemoryGameStore((state) => state.win);
   const lose = useMemoryGameStore((state) => state.lose);
+  const time = useMemoryGameStore((state) => state.time);
   const modality = useMemoryGameStore((state) => state.modality);
   const setModality = useMemoryGameStore((state) => state.setModality);
+  const activeBalls = useMemoryGameStore((state) => state.activeBalls);
   const matchStatus = useMemoryGameStore((state) => state.modality);
 
   useEffect(() => {
@@ -74,19 +76,19 @@ export default function MemoryGame() {
         >
           <div className="flex justify-center items-center gap-3 text-2xl font-bold text-primary">
             <img src="./timer.png" alt="Timer" className="timer" />
-            <h4>{modality.time}</h4>
+            <h4>{time}</h4>
           </div>
           <div className="status-bar">
-            <div className="status-indicator filled"></div>
-            <div className="status-indicator filled"></div>
-            <div className="status-indicator filled"></div>
-            <div className="status-indicator filled"></div>
-            <div className="status-indicator filled"></div>
-            <div className="status-indicator filled"></div>
-            <div className="status-indicator filled"></div>
-            <div className="status-indicator"></div>
-            <div className="status-indicator"></div>
-            <div className="status-indicator"></div>
+            {/* Genera i pallini dinamicamente  */}
+            {Array.from({ length: activeBalls }).map((_, index) => (
+              <div
+                key={index}
+                // Applica 'filled' solo se l'indice è inferiore al numero di pallini attivi
+                className={`status-indicator ${
+                  index < activeBalls ? "filled" : ""
+                }`}
+              ></div>
+            ))}
           </div>
         </div>
       </div>
