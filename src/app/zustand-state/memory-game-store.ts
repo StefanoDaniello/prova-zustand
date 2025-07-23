@@ -94,12 +94,13 @@ type IconItem = {
 
 type ModalityOption = {
   name: "easy" | "medium" | "hard" | "impossible";
-  isActive: boolean;
+  cardNumber: number;
+  time: string;
+  col: string;
 };
 
 type MatchStatusOption = {
   name: "win" | "lose" | "progress";
-  isActive: boolean;
 };
 
 type MemoryGameStore = {
@@ -114,13 +115,24 @@ type MemoryGameStore = {
   point: number;
   win: number;
   lose: number;
-  time: string;
   matchStatus: MatchStatusOption;
   setMatchStatus: () => void;
   modality: ModalityOption;
-  setModality: () => void;
+  setModality: (name: string) => void;
 };
 
+export const Modalities: ModalityOption[] = [
+  { name: "easy", cardNumber: 6, time: "1:00", col: "3" },
+  { name: "medium", cardNumber: 12, time: "1:30", col: "4" },
+  { name: "hard", cardNumber: 18, time: "1:50", col: "6" },
+  { name: "impossible", cardNumber: 30, time: "1:70", col: "10" },
+];
+
+export const MatchStatuses: MatchStatusOption[] = [
+  { name: "progress" },
+  { name: "win" },
+  { name: "lose" },
+];
 // Funzione per mischiare un array
 function shuffle<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5);
@@ -134,15 +146,28 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
   point: 0,
   win: 0,
   lose: 0,
-  time: "3:20",
-  modality: { name: "easy", isActive: false },
+  modality: Modalities[0],
   matchStatus: { name: "progress", isActive: false },
 
+  setModality: (name) => {
+    const { setShuffledIcons } = get();
+    const selectModality = Modalities.find((modality) =>
+      modality.name == name ? modality : null
+    );
+
+    set({
+      modality: selectModality,
+    });
+
+    setShuffledIcons();
+  },
+
   setMatchStatus: () => {},
-  setModality: () => {},
 
   setShuffledIcons: () => {
-    const selected = shuffle(baseIcons).slice(0, 6);
+    const { modality } = get();
+    const cardNumber = modality.cardNumber / 2;
+    const selected = shuffle(baseIcons).slice(0, cardNumber);
     const duplicated = [...selected, ...selected].map((item, index) => ({
       ...item,
       id: index + 1, // Assegna ID univoci da 1 a 12
@@ -215,7 +240,7 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
   },
 
   checkMatchCard: () => {
-    const { flippedCardsInTurn, reShuffleBoard, shuffledIcons } = get();
+    const { flippedCardsInTurn, reShuffleBoard } = get();
 
     if (flippedCardsInTurn.length !== 2) {
       console.error(
