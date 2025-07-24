@@ -20,6 +20,7 @@ export default function MemoryGame() {
   const setModality = useMemoryGameStore((state) => state.setModality);
   const activeBalls = useMemoryGameStore((state) => state.activeBalls);
   const matchStatus = useMemoryGameStore((state) => state.matchStatus);
+  const setMatchStatus = useMemoryGameStore((state) => state.setMatchStatus);
 
   useEffect(() => {
     if (shuffledIcons.length === 0) {
@@ -32,15 +33,13 @@ export default function MemoryGame() {
   }
 
   const confettiRan = useRef(false); // Usa useRef per tenere traccia se i coriandoli sono già stati sparati
-  const duration = 15 * 1000;
-  const animationEnd = Date.now() + duration;
-  let skew = 1;
-
-  const timeLeft = animationEnd - Date.now();
-  const ticks = Math.max(200, 500 * (timeLeft / duration));
-  skew = Math.max(0.8, skew - 0.001);
-
   useEffect(() => {
+    if (matchStatus.name === "progress") {
+      // Reset animation flag così da poter riavviare animazioni future
+      confettiRan.current = false;
+      return; // esco subito perché non serve far partire confetti in "progress"
+    }
+
     if (
       (matchStatus.name === "win" || matchStatus.name === "lose") &&
       !confettiRan.current
@@ -183,6 +182,9 @@ export default function MemoryGame() {
                 : "Hai Perso, andra meglio la prossima volta!"}
             </h4>
             <button
+              onClick={() => {
+                setMatchStatus("progress");
+              }}
               className={`flex items-center px-4 py-2 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform rounded-lg focus:outline-none focus:ring  focus:ring-opacity-80 hover:cursor-pointer ${
                 matchStatus.name === "win"
                   ? "bg-blue-600  hover:bg-blue-500  focus:ring-blue-300"

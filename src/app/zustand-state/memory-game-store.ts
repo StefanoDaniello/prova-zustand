@@ -32,6 +32,7 @@ import {
   ThumbsUp,
   Watch,
 } from "lucide-react";
+import { match } from "assert";
 
 const baseIcons: IconItem[] = [
   { id: 1, name: "heart", icon: Heart, flipped: false, matched: false },
@@ -114,18 +115,18 @@ type MemoryGameStore = {
   point: number;
   win: number;
   lose: number;
-  time: string;
   activeBalls: number;
-  setTime: (time: string) => void;
+  time: string;
+  setTime: (time: string, resetInterval?: boolean) => void;
   matchStatus: MatchStatusOption;
-  setMatchStatus: () => void;
+  setMatchStatus: (name: string) => void;
   modality: ModalityOption;
   setModality: (name: string) => void;
   countdownIntervalId: any;
 };
 
 export const Modalities: ModalityOption[] = [
-  { name: "easy", cardNumber: 6, time: "1:00", col: "3" },
+  { name: "easy", cardNumber: 6, time: "0:10", col: "3" },
   { name: "medium", cardNumber: 12, time: "1:30", col: "4" },
   { name: "hard", cardNumber: 18, time: "1:50", col: "6" },
   { name: "impossible", cardNumber: 30, time: "1:70", col: "10" },
@@ -162,7 +163,7 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
   activeBalls: 10,
   time: "00:00",
   modality: Modalities[0],
-  matchStatus: MatchStatuses[2],
+  matchStatus: MatchStatuses[0],
   countdownIntervalId: null,
 
   setModality: (name) => {
@@ -177,11 +178,11 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
     setTime(selectModality?.time ? selectModality?.time : modality.time);
   },
 
-  setTime: (selectTime) => {
-    const { countdownIntervalId } = get();
+  setTime: (selectTime, resetInterval) => {
+    const { countdownIntervalId, setMatchStatus } = get();
 
     // 1. Pulisci qualsiasi intervallo precedente per evitare più timer contemporanei
-    if (countdownIntervalId) {
+    if (countdownIntervalId || resetInterval) {
       clearInterval(countdownIntervalId);
       set({ countdownIntervalId: null }); // Resetta l'ID nello stato
     }
@@ -232,6 +233,18 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
         });
       } else {
         // 5. Tempo scaduto!
+        set({ canFlip: false });
+
+        //permette di leggere lo stato corrente del tuo store al di fuori della funzione set.
+        const checkshuffledIcons = get().shuffledIcons;
+        // Allo scadere del tempo appena trova una card con match a a flse imposta la partita a lose
+        for (const card of checkshuffledIcons) {
+          if (!card.matched) {
+            setMatchStatus("lose");
+            break;
+          }
+        }
+
         clearInterval(newIntervalId); // Ferma il timer
         set({
           countdownIntervalId: null, // Resetta l'ID del timer
@@ -244,7 +257,33 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
     set({ countdownIntervalId: newIntervalId });
   },
 
-  setMatchStatus: () => {},
+  setMatchStatus: (name) => {
+    const { setShuffledIcons } = get();
+
+    switch (name) {
+      case "progress":
+        set({
+          matchStatus: MatchStatuses[0],
+        });
+        setShuffledIcons();
+        break;
+      case "win":
+        set((state) => ({
+          win: state.win + 1,
+        }));
+        break;
+      case "lose":
+        set((state) => ({
+          lose: state.lose + 1,
+        }));
+        break;
+    }
+    set({
+      matchStatus: MatchStatuses.find((matchStatus) =>
+        matchStatus.name == name ? matchStatus : null
+      ),
+    });
+  },
 
   setShuffledIcons: () => {
     const { modality, setTime } = get();
@@ -322,7 +361,13 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
   },
 
   checkMatchCard: () => {
-    const { flippedCardsInTurn, reShuffleBoard } = get();
+    const {
+      flippedCardsInTurn,
+      reShuffleBoard,
+      setMatchStatus,
+      setShuffledIcons,
+      setTime,
+    } = get();
 
     if (flippedCardsInTurn.length !== 2) {
       console.error(
@@ -344,6 +389,7 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
         ),
         flippedCardsInTurn: [], // Pulisce l'array temporaneo
         canFlip: true,
+        point: state.point + 1,
       }));
       console.log(`Corrispondenza trovata: ${card1.name}`);
     } else {
@@ -378,9 +424,19 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
           // Se la carta non è ancora abbinata, la flippa e la marca come abbinata
           !card.matched ? { ...card, flipped: true, matched: true } : card
         ),
+        point: state.point + 1,
         // Non è necessario toccare flippedCardsInTurn o canFlip qui,
         // sono già stati gestiti dal set precedente e il gioco è quasi finito.
       }));
+
+      //permette di leggere lo stato corrente del tuo store al di fuori della funzione set.
+      const checkshuffledIcons = get().shuffledIcons;
+      // Allo scadere del tempo appena trova una card con match a a flse imposta la partita a lose
+      const allMatched = checkshuffledIcons.every((card) => card.matched);
+      if (allMatched) {
+        setMatchStatus("win");
+        setTime("00:00", true);
+      }
     } else {
       // setTimeout(() => {
       //   reShuffleBoard();
