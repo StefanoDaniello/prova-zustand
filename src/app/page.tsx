@@ -4,11 +4,10 @@ import { useEffect, ElementType, useRef, use, useState } from "react";
 import confetti from "canvas-confetti";
 
 import { useMemoryGameStore } from "./store";
-import { Modalities, MatchStatuses } from "./store";
+import { Modalities } from "./store";
 
 export default function MemoryGame() {
   const loading = useMemoryGameStore((state) => state.loading);
-  const setLoading = useMemoryGameStore((state) => state.setLoading);
   const shuffledIcons = useMemoryGameStore((state) => state.shuffledIcons);
   const setShuffledIcons = useMemoryGameStore(
     (state) => state.setShuffledIcons
@@ -23,12 +22,6 @@ export default function MemoryGame() {
   const activeBalls = useMemoryGameStore((state) => state.activeBalls);
   const matchStatus = useMemoryGameStore((state) => state.matchStatus);
   const setMatchStatus = useMemoryGameStore((state) => state.setMatchStatus);
-
-  useEffect(() => {
-    if (shuffledIcons.length === 0) {
-      setShuffledIcons();
-    }
-  }, [shuffledIcons, setShuffledIcons]);
 
   function randomInRange(min: number, max: number) {
     return Math.random() * (max - min) + min;
@@ -329,9 +322,8 @@ function Card({
     <div
       onClick={() => flipCard(id)}
       className="relative 
-             w-[50px] h-[80px]           
-             sm:w-[80px] sm:h-[120px]    
-             md:w-[80px] md:h-[120px]    
+             w-[80px] h-[120px]              
+             md:w-[100px] md:h-[150px]    
              lg:w-[120px] lg:h-[180px]   
              perspective cursor-pointer"
     >
@@ -369,11 +361,19 @@ function Menu() {
   const setModality = useMemoryGameStore((state) => state.setModality);
   const setMatchStatus = useMemoryGameStore((state) => state.setMatchStatus);
   const setLoading = useMemoryGameStore((state) => state.setLoading);
+  const shuffledIcons = useMemoryGameStore((state) => state.shuffledIcons);
+  const setShuffledIcons = useMemoryGameStore(
+    (state) => state.setShuffledIcons
+  );
 
   // setMatchStatus("menu");
 
   function modalityAndSong(modalityName: string) {
     setModality(modalityName);
+
+    if (shuffledIcons.length === 0) {
+      setShuffledIcons();
+    }
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
@@ -385,7 +385,7 @@ function Menu() {
       <div className="fixed inset-0 z-50 bg-black flex justify-center items-center">
         <div className="flex flex-col items-center justify-center space-y-5 px-2">
           <div className="flex flex-col items-center gap-2 space-y-3">
-            <h4 className="text-xl sm:text-2xl md:text-5xl font-bold text-primary mb-5">
+            <h4 className="text-3xl md:text-5xl font-bold text-primary mb-5">
               Scegli la tua Modalità
             </h4>
 

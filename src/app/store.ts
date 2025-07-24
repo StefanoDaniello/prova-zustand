@@ -126,7 +126,7 @@ type MemoryGameStore = {
 };
 
 export const Modalities: ModalityOption[] = [
-  { name: "easy", cardNumber: 6, time: "0:10" },
+  { name: "easy", cardNumber: 6, time: "0:30" },
   { name: "medium", cardNumber: 12, time: "1:30" },
   { name: "hard", cardNumber: 18, time: "1:50" },
   { name: "impossible", cardNumber: 20, time: "1:70" },
@@ -183,7 +183,7 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
       modality: selectModality,
     });
     setShuffledIcons();
-    setTime(selectModality?.time ? selectModality?.time : modality.time);
+    // setTime(selectModality?.time ? selectModality?.time : modality.time);
   },
 
   setTime: (selectTime, resetInterval) => {
@@ -217,6 +217,7 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
     });
 
     // 4. Avvia il countdown
+
     const newIntervalId = setInterval(() => {
       if (totalSeconds > 0) {
         totalSeconds -= 1; // Decrementa di un secondo
@@ -245,7 +246,7 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
 
         //permette di leggere lo stato corrente del tuo store al di fuori della funzione set.
         const checkshuffledIcons = get().shuffledIcons;
-        // Allo scadere del tempo appena trova una card con match a a flse imposta la partita a lose
+        // Allo scadere del tempo appena trova una card con match a flse imposta la partita a lose
         for (const card of checkshuffledIcons) {
           if (!card.matched) {
             setMatchStatus("lose");
