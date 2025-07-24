@@ -123,6 +123,8 @@ type MemoryGameStore = {
   countdownIntervalId: any;
   loading: boolean;
   setLoading: (stato: boolean) => void;
+  startGame: boolean;
+  setStartGame: (stato: boolean) => void;
 };
 
 export const Modalities: ModalityOption[] = [
@@ -167,6 +169,13 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
   matchStatus: MatchStatuses[3],
   countdownIntervalId: null,
   loading: false,
+  startGame: true,
+
+  setStartGame: (stato) => {
+    set({
+      startGame: stato,
+    });
+  },
 
   setLoading: (stato) => {
     set({
@@ -271,9 +280,6 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
 
     switch (name) {
       case "progress":
-        set({
-          matchStatus: MatchStatuses[0],
-        });
         setShuffledIcons();
         break;
       case "win":

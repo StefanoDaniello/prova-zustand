@@ -12,6 +12,7 @@ export default function MemoryGame() {
   const setShuffledIcons = useMemoryGameStore(
     (state) => state.setShuffledIcons
   );
+  const startGame = useMemoryGameStore((state) => state.startGame);
 
   const point = useMemoryGameStore((state) => state.point);
   const win = useMemoryGameStore((state) => state.win);
@@ -34,6 +35,7 @@ export default function MemoryGame() {
     win: null,
     lose: null,
     progress: null,
+    menu: null,
   });
 
   // Setup dei suoni quando il componente è montato nel browser
@@ -59,6 +61,12 @@ export default function MemoryGame() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!startGame) {
+      playMatchSound("menu");
+    }
+  }, [startGame]);
+
   // Funzione per riprodurre il suono in base allo stato
   function playMatchSound(status: string | any) {
     const newAudio = sounds.current[status];
@@ -78,11 +86,12 @@ export default function MemoryGame() {
   }
 
   const confettiRan = useRef(false); // Usa useRef per tenere traccia se i coriandoli sono già stati sparati
+
   useEffect(() => {
     if (matchStatus?.name === "progress") {
+      playMatchSound("progress");
       // Reset animation flag così da poter riavviare animazioni future
       confettiRan.current = false;
-      playMatchSound("progress");
       return; // esco subito perché non serve far partire confetti in "progress"
     }
 
@@ -137,12 +146,15 @@ export default function MemoryGame() {
 
       confettiRan.current = true;
     }
-
-    playMatchSound(matchStatus?.name);
+    if (matchStatus?.name != "menu") {
+      console.log(matchStatus?.name);
+      playMatchSound(matchStatus?.name);
+    }
   }, [matchStatus]);
 
   function restartGame() {
     setMatchStatus("menu");
+    playMatchSound("menu");
   }
 
   return (
@@ -365,8 +377,8 @@ function Menu() {
   const setShuffledIcons = useMemoryGameStore(
     (state) => state.setShuffledIcons
   );
-
-  // setMatchStatus("menu");
+  const setStartGame = useMemoryGameStore((state) => state.setStartGame);
+  const startGame = useMemoryGameStore((state) => state.startGame);
 
   function modalityAndSong(modalityName: string) {
     setModality(modalityName);
@@ -381,8 +393,8 @@ function Menu() {
     setMatchStatus("progress");
   }
   return (
-    <>
-      <div className="fixed inset-0 z-50 bg-black flex justify-center items-center">
+    <div className="fixed inset-0 z-50 bg-black flex justify-center items-center">
+      {!startGame ? (
         <div className="flex flex-col items-center justify-center space-y-5 px-2">
           <div className="flex flex-col items-center gap-2 space-y-3">
             <h4 className="text-3xl md:text-5xl font-bold text-primary mb-5">
@@ -397,19 +409,19 @@ function Menu() {
                   key={m.name}
                   onClick={() => modalityAndSong(m.name)}
                   className={`
-                    relative w-full max-w-sm h-20 flex items-center justify-center
-                    text-2xl font-bold tracking-wide text-white capitalize
-                    bg-[url('/card-front.jpg')] bg-cover bg-center bg-no-repeat
-                    rounded-lg border-2 border-white overflow-hidden
-                    hover:cursor-pointer hover:border-[#e0d080] hover:text-[#e0d080]
-                  
-                  `}
+                  relative w-full max-w-sm h-20 flex items-center justify-center
+                  text-2xl font-bold tracking-wide text-white capitalize
+                  bg-[url('/card-front.jpg')] bg-cover bg-center bg-no-repeat
+                  rounded-lg border-2 border-white overflow-hidden
+                  hover:cursor-pointer hover:border-[#e0d080] hover:text-[#e0d080]
+                
+                `}
                 >
                   {/* Overlay per l'effetto hover */}
                   <div
                     className={`
-                    absolute inset-0 bg-black opacity-20 transition-opacity duration-300 hover:opacity-40 
-                  `}
+                  absolute inset-0 bg-black opacity-20 transition-opacity duration-300 hover:opacity-40 
+                `}
                   ></div>
                   <span className="relative z-10">
                     {m.name.charAt(0).toUpperCase() + m.name.slice(1)}
@@ -419,7 +431,34 @@ function Menu() {
             </div>
           </div>
         </div>
-      </div>
-    </>
+      ) : (
+        <div className="flex flex-col items-center justify-center space-y-5 px-2">
+          <div className="flex flex-col items-center gap-2 space-y-3">
+            <h4 className="text-3xl md:text-5xl font-bold text-primary mb-5">
+              Sei Pronto per iniziare ?
+            </h4>
+
+            <button
+              onClick={() => setStartGame(false)}
+              className="
+                  relative w-full max-w-md h-20 flex items-center justify-center
+                  text-2xl font-bold tracking-wide text-white capitalize
+                  bg-[url('/card-front.jpg')] bg-cover bg-center bg-no-repeat
+                  rounded-lg border-2 border-white overflow-hidden
+                  hover:cursor-pointer hover:border-[#e0d080] hover:text-[#e0d080]
+                
+                "
+            >
+              <div
+                className={`
+                  absolute inset-0 bg-black opacity-20 transition-opacity duration-300 hover:opacity-40 
+                `}
+              ></div>
+              <span className="relative z-10">Premi per iniziare</span>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
