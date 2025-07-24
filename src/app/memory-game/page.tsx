@@ -93,20 +93,25 @@ export default function MemoryGame() {
 
   return (
     <div>
-      <div>
+      <div className="max-w-8xl m-auto mt-5">
         <div className="max-w-6xl m-auto mt-5">
-          <div className="flex justify-between items-center gap-4 p-4 w-full flex-wrap">
+          <div
+            className="flex flex-wrap justify-between sm:justify-between gap-4 p-4 w-full
+            items-center text-center
+            sm:text-left
+            [&>*]:mx-auto sm:[&>*]:mx-0"
+          >
             <div className="flex-col items-center">
-              <div className="flex items-center gap-2 text-2xl font-bold text-primary">
+              <div className="flex items-center gap-2 text-lg sm:text-xl md:text-2xl font-bold text-primary">
                 <h4>Punti:</h4>
                 <span>{point}</span>
               </div>
-              <div className="flex items-center gap-5">
-                <div className="flex items-center gap-2 text-lg font-semibold ">
+              <div className="flex items-center gap-5 mt-2">
+                <div className="flex items-center gap-2 text-base sm:text-lg md:text-xl font-semibold">
                   <h4>Vinte:</h4>
                   <span>{win}</span>
                 </div>
-                <div className="flex items-center gap-2 text-lg font-semibold ">
+                <div className="flex items-center gap-2 text-base sm:text-lg md:text-xl font-semibold">
                   <h4>Perse:</h4>
                   <span>{lose}</span>
                 </div>
@@ -115,9 +120,11 @@ export default function MemoryGame() {
 
             <div className="flex justify-end  pr-4">
               <div className="flex flex-col items-center gap-2">
-                <h4 className="text-xl font-bold text-primary">Modalità</h4>
+                <h4 className="text-lg sm:text-xl md:text-2xl font-bold text-primary">
+                  Modalità
+                </h4>
                 <select
-                  className="select px-2 rounded-full shadow-lg border-white border-2 text-white bg-transparent"
+                  className="select px-2 rounded-full shadow-lg border-white border-2 text-white bg-transparent "
                   aria-label="Selezione Modalità"
                   onChange={(e) => setModality(e.target.value)}
                   value={modality.name}
@@ -137,12 +144,14 @@ export default function MemoryGame() {
           </div>
 
           <div
-            className="w-full flex justify-center items-center gap-5"
+            className="w-full flex justify-center items-center "
             id="status-bar"
           >
-            <div className="flex justify-center items-center gap-3 text-2xl font-bold text-primary">
+            <div className="flex justify-center items-center gap-3 ">
               <img src="./timer.png" alt="Timer" className="timer" />
-              <h4>{time}</h4>
+              <h4 className="sm:text-xl md:text-2xl font-bold text-primary">
+                {time}
+              </h4>
             </div>
             <div className="status-bar">
               {/* Genera i pallini dinamicamente  */}
@@ -159,7 +168,24 @@ export default function MemoryGame() {
           </div>
         </div>
         <div className="flex justify-center items-center p-5 mt-10">
-          <div className={`grid grid-cols-${modality.col} gap-4`}>
+          <div
+            className={`
+            grid gap-4
+            ${modality.name === "easy" && "grid-cols-3 sm:grid-cols-3"}
+            ${
+              modality.name === "medium" &&
+              "grid-cols-3 sm:grid-cols-4 md:grid-cols-4"
+            }
+            ${
+              modality.name === "hard" &&
+              "grid-cols-4 sm:grid-cols-4 md:grid-cols-6"
+            }
+            ${
+              modality.name === "impossible" &&
+              "grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-8 xl:grid-cols-10"
+            }
+          `}
+          >
             {shuffledIcons.map((icon) => (
               <Card
                 key={icon.id}
@@ -175,8 +201,8 @@ export default function MemoryGame() {
 
       {(matchStatus.name === "win" || matchStatus.name === "lose") && (
         <div className="fixed inset-0 z-50 bg-black/90 flex justify-center items-center">
-          <div className="flex flex-col items-center justify-center space-y-5">
-            <h4 className="text-white text-3xl font-bold">
+          <div className="flex flex-col items-center justify-center space-y-5 px-2">
+            <h4 className="text-white text-xl md:text-3xl font-bold text-center">
               {matchStatus.name === "win"
                 ? "Hai Vinto Complimenti!"
                 : "Hai Perso, andra meglio la prossima volta!"}
@@ -185,7 +211,7 @@ export default function MemoryGame() {
               onClick={() => {
                 setMatchStatus("progress");
               }}
-              className={`flex items-center px-4 py-2 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform rounded-lg focus:outline-none focus:ring  focus:ring-opacity-80 hover:cursor-pointer ${
+              className={`flex items-center px-2 md:px-4 py-2 font-medium tracking-wide text-white capitalize transition-colors duration-300 transform rounded-lg focus:outline-none focus:ring  focus:ring-opacity-80 hover:cursor-pointer ${
                 matchStatus.name === "win"
                   ? "bg-blue-600  hover:bg-blue-500  focus:ring-blue-300"
                   : "bg-red-600  hover:bg-red-500  focus:ring-red-300"
@@ -229,7 +255,12 @@ function Card({
   return (
     <div
       onClick={() => flipCard(id)}
-      className="relative w-[150px] h-[200px] perspective cursor-pointer "
+      className="relative 
+             w-[50px] h-[80px]           
+             sm:w-[80px] sm:h-[120px]    
+             md:w-[80px] md:h-[120px]    
+             lg:w-[120px] lg:h-[180px]   
+             perspective cursor-pointer"
     >
       <div
         className={`relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group ${
@@ -249,7 +280,13 @@ function Card({
             matched ? "border-yellow-500" : "border-white"
           }`}
         >
-          <IconComponent className="w-20 h-20" />
+          <IconComponent
+            className="w-8 h-8
+             sm:w-10 sm:h-10
+             md:w-10 md:h-10 
+             lg:w-18 lg:h-18
+             xl:w-23 xl:h-23"
+          />
         </div>
       </div>
     </div>

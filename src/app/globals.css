@@ -55,6 +55,7 @@ body {
 
 .status-bar {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   padding: 20px;
   border-radius: 10px;
@@ -92,4 +93,55 @@ body {
   filter: brightness(0) saturate(100%) invert(99%) sepia(0%) saturate(7500%)
     hue-rotate(185deg) brightness(101%) contrast(104%);
   width: 30px;
+}
+
+@media (max-width: 1024px) {
+  .status-indicator {
+    width: 45px;
+    height: 35px;
+    border-radius: 30px;
+    border-width: 2px;
+  }
+
+  .timer {
+    width: 20px;
+  }
+
+  .status-bar {
+    padding: 10px;
+    gap: 5px;
+  }
+
+  .status-indicator.filled {
+    border-width: 2px;
+  }
+}
+
+@media (max-width: 768px) {
+  .status-indicator {
+    width: 32px;
+    height: 25px;
+    border-radius: 30px;
+    border-width: 2px;
+  }
+
+  .timer {
+    width: 20px;
+  }
+
+  .status-bar {
+    padding: 10px;
+    gap: 5px;
+  }
+
+  .status-indicator.filled {
+    border-width: 2px;
+  }
+}
+
+/* Responsive scaling */
+@media (max-width: 480px) {
+  .status-indicator {
+    display: none;
+  }
 }

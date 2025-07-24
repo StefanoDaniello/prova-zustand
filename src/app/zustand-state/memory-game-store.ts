@@ -32,7 +32,6 @@ import {
   ThumbsUp,
   Watch,
 } from "lucide-react";
-import { match } from "assert";
 
 const baseIcons: IconItem[] = [
   { id: 1, name: "heart", icon: Heart, flipped: false, matched: false },
@@ -97,7 +96,6 @@ type ModalityOption = {
   name: "easy" | "medium" | "hard" | "impossible";
   cardNumber: number;
   time: string;
-  col: string;
 };
 
 type MatchStatusOption = {
@@ -126,10 +124,10 @@ type MemoryGameStore = {
 };
 
 export const Modalities: ModalityOption[] = [
-  { name: "easy", cardNumber: 6, time: "1:00", col: "3" },
-  { name: "medium", cardNumber: 12, time: "1:30", col: "4" },
-  { name: "hard", cardNumber: 18, time: "1:50", col: "6" },
-  { name: "impossible", cardNumber: 30, time: "1:70", col: "10" },
+  { name: "easy", cardNumber: 6, time: "1:00" },
+  { name: "medium", cardNumber: 12, time: "1:30" },
+  { name: "hard", cardNumber: 18, time: "1:50" },
+  { name: "impossible", cardNumber: 20, time: "1:70" },
 ];
 
 export const MatchStatuses: MatchStatusOption[] = [
