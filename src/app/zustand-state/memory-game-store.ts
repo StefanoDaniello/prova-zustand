@@ -99,7 +99,7 @@ type ModalityOption = {
 };
 
 type MatchStatusOption = {
-  name: "win" | "lose" | "progress";
+  name: "win" | "lose" | "progress" | "menu";
 };
 
 type MemoryGameStore = {
@@ -121,10 +121,12 @@ type MemoryGameStore = {
   modality: ModalityOption;
   setModality: (name: string) => void;
   countdownIntervalId: any;
+  loading: boolean;
+  setLoading: (stato: boolean) => void;
 };
 
 export const Modalities: ModalityOption[] = [
-  { name: "easy", cardNumber: 6, time: "1:00" },
+  { name: "easy", cardNumber: 6, time: "0:10" },
   { name: "medium", cardNumber: 12, time: "1:30" },
   { name: "hard", cardNumber: 18, time: "1:50" },
   { name: "impossible", cardNumber: 20, time: "1:70" },
@@ -134,6 +136,7 @@ export const MatchStatuses: MatchStatusOption[] = [
   { name: "progress" },
   { name: "win" },
   { name: "lose" },
+  { name: "menu" },
 ];
 // Funzione per mischiare un array
 function shuffle<T>(array: T[]): T[] {
@@ -161,8 +164,15 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
   activeBalls: 10,
   time: "00:00",
   modality: Modalities[0],
-  matchStatus: MatchStatuses[0],
+  matchStatus: MatchStatuses[3],
   countdownIntervalId: null,
+  loading: false,
+
+  setLoading: (stato) => {
+    set({
+      loading: stato,
+    });
+  },
 
   setModality: (name) => {
     const { setShuffledIcons, setTime, modality, countdownIntervalId } = get();
@@ -274,6 +284,11 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
         set((state) => ({
           lose: state.lose + 1,
         }));
+        break;
+      case "menu":
+        set({
+          matchStatus: MatchStatuses[3],
+        });
         break;
     }
     set({
@@ -432,7 +447,9 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
       // Allo scadere del tempo appena trova una card con match a a flse imposta la partita a lose
       const allMatched = checkshuffledIcons.every((card) => card.matched);
       if (allMatched) {
-        setMatchStatus("win");
+        setTimeout(() => {
+          setMatchStatus("win");
+        }, 500);
         setTime("00:00", true);
       }
     } else {
