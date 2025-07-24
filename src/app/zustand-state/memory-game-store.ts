@@ -105,13 +105,12 @@ type MatchStatusOption = {
 
 type MemoryGameStore = {
   shuffledIcons: IconItem[];
-  flippedCardsInTurn: IconItem[]; // controlla a turni le 2 card dell utente
+  flippedCardsInTurn: IconItem[];
   setShuffledIcons: () => void;
   flipCard: (id: number) => void;
-  checkMatchCard: () => void; // Controlla se le due carte girate corrispondono
+  checkMatchCard: () => void;
   canFlip: boolean;
   reShuffleBoard: () => void;
-
   point: number;
   win: number;
   lose: number;
@@ -163,7 +162,7 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
   activeBalls: 10,
   time: "00:00",
   modality: Modalities[0],
-  matchStatus: { name: "progress", isActive: false },
+  matchStatus: MatchStatuses[2],
   countdownIntervalId: null,
 
   setModality: (name) => {
