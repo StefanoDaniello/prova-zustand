@@ -160,16 +160,18 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
   shuffledIcons: [],
   flippedCardsInTurn: [],
   canFlip: true,
+  // Cose da salvare nel local Storage
   point: 0,
   win: 0,
   lose: 0,
   activeBalls: 10,
+  startGame: true,
+  //
   time: "00:00",
   modality: Modalities[0],
   matchStatus: MatchStatuses[3],
   countdownIntervalId: null,
   loading: false,
-  startGame: true,
 
   setStartGame: (stato) => {
     set({
