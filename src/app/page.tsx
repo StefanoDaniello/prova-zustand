@@ -217,7 +217,13 @@ export default function MemoryGame() {
               id="status-bar"
             >
               <div className="flex justify-center items-center gap-3 ">
-                <Image src="./timer.png" alt="Timer" className="timer" />
+                <Image
+                  src="/timer.png"
+                  alt="Timer"
+                  className="timer"
+                  width={30}
+                  height={30}
+                />
                 <h4 className="sm:text-xl md:text-2xl font-bold text-primary">
                   {time}
                 </h4>
