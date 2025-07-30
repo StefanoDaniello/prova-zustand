@@ -1,17 +1,18 @@
 "use client";
 
-import { useEffect, ElementType, useRef, use, useState } from "react";
+import { useEffect, ElementType, useRef } from "react";
 import confetti from "canvas-confetti";
 
 import { useMemoryGameStore } from "./store";
 import { Modalities } from "./store";
+import Image from "next/image";
 
 export default function MemoryGame() {
   const loading = useMemoryGameStore((state) => state.loading);
   const shuffledIcons = useMemoryGameStore((state) => state.shuffledIcons);
-  const setShuffledIcons = useMemoryGameStore(
-    (state) => state.setShuffledIcons
-  );
+  // const setShuffledIcons = useMemoryGameStore(
+  //   (state) => state.setShuffledIcons
+  // );
   const startGame = useMemoryGameStore((state) => state.startGame);
 
   const point = useMemoryGameStore((state) => state.point);
@@ -68,7 +69,8 @@ export default function MemoryGame() {
   }, [startGame]);
 
   // Funzione per riprodurre il suono in base allo stato
-  function playMatchSound(status: string | any) {
+
+  function playMatchSound(status: any | string) {
     const newAudio = sounds.current[status];
 
     if (!newAudio || currentAudioRef.current === newAudio) return;
@@ -215,7 +217,7 @@ export default function MemoryGame() {
               id="status-bar"
             >
               <div className="flex justify-center items-center gap-3 ">
-                <img src="./timer.png" alt="Timer" className="timer" />
+                <Image src="./timer.png" alt="Timer" className="timer" />
                 <h4 className="sm:text-xl md:text-2xl font-bold text-primary">
                   {time}
                 </h4>

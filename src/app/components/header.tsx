@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function Header() {
@@ -8,7 +9,7 @@ export default function Header() {
     <header>
       <nav className="bg-white shadow dark:bg-gray-800">
         <div className="container flex items-center justify-center p-6 mx-auto text-gray-600 capitalize dark:text-gray-300">
-          <a
+          <Link
             href="/"
             className={`mx-1.5 sm:mx-6 border-b-2 transition-colors duration-300 transform ${
               pathname === "/"
@@ -17,8 +18,8 @@ export default function Header() {
             }`}
           >
             Home
-          </a>
-          <a
+          </Link>
+          <Link
             href="/memory-game"
             className={`mx-1.5 sm:mx-6 border-b-2 transition-colors duration-300 transform ${
               pathname === "/memory-game"
@@ -27,7 +28,7 @@ export default function Header() {
             }`}
           >
             Memory Game
-          </a>
+          </Link>
         </div>
       </nav>
     </header>

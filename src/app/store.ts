@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { ReactNode, ElementType, JSX } from "react";
+import { ElementType } from "react";
 import {
   Heart,
   Star,
@@ -120,7 +120,7 @@ type MemoryGameStore = {
   setMatchStatus: (name: string) => void;
   modality: ModalityOption;
   setModality: (name: string) => void;
-  countdownIntervalId: any;
+  countdownIntervalId: any | null;
   loading: boolean;
   setLoading: (stato: boolean) => void;
   startGame: boolean;
@@ -186,7 +186,7 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
   },
 
   setModality: (name) => {
-    const { setShuffledIcons, setTime, modality, countdownIntervalId } = get();
+    const { setShuffledIcons } = get();
     const selectModality = Modalities.find((modality) =>
       modality.name == name ? modality : null
     );
@@ -378,13 +378,7 @@ export const useMemoryGameStore = create<MemoryGameStore>((set, get) => ({
   },
 
   checkMatchCard: () => {
-    const {
-      flippedCardsInTurn,
-      reShuffleBoard,
-      setMatchStatus,
-      setShuffledIcons,
-      setTime,
-    } = get();
+    const { flippedCardsInTurn, setMatchStatus, setTime } = get();
 
     if (flippedCardsInTurn.length !== 2) {
       console.error(
